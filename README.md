@@ -5,7 +5,8 @@ Some of this knowledge has been chronicled in journal or conference papers, but 
 I find myself repeating the same guidance to multiple people every few weeks.
 I have started this repo with the goal of formalizing some of this knowledge in a central location.
 
-Each topic below
+Each page below covers a topic I've found particularly thorny for optimization practitioners.
+These pages reflect my views and do not the end-all be-all best practices for performing optimization. 
 
 - [How to formulate optimization problems](formulation.md)
 - [Which optimizer should I use?](optimizers.md)

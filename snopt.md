@@ -38,59 +38,65 @@ These options are set via an options dictionary via pyOptSparse or OpenMDAO.
 One thing to note is that certain options do not take a corresponding value, i.e. they're more like a switch which turns on a feature when enabled.
 For these options, the corresponding value in the dictionary must be supplied as the Python keyword ``None``.
 
-``Major iterations limit``
+### ``Major iterations limit``
   This sets the maximum number of major iterations.
   If you want to simply test your code without running the full optimization, you could set this value to 0 or 1.
-``Major feasibility tolerance``
+  
+### ``Major feasibility tolerance``
   This sets the feasibility tolerance of the optimization, which is a measure of the constraint violation. Specifically, it is computed as
 
-  <!-- .. math::
-    \max_i \frac{|g_i(x)|}{||x||} -->
-    
-  <img src="https://render.githubusercontent.com/render/math?math=e^{i \pi} = -1">
+![\max_i \frac{|g_i(x)|}{||x||}](https://render.githubusercontent.com/render/math?math=%5Cmax_i%20%5Cfrac%7B%7Cg_i(x)%7C%7D%7B%7C%7Cx%7C%7C%7D)
 
   Obviously, it does not make sense to prescribe a feasibility tolerance which is tighter than the function precision of the constraint functions.
-``Major optimality tolerance``
+  
+### ``Major optimality tolerance``
   This is essentially a measure of the numerical tolerances on the KKT system.
   Please look at the SNOPT manual for a precise definition of this term.
-``Verify level``
+  
+### ``Verify level``
   This controls whether a derivative check is performed, where the supplied analytic gradients are compared against finite-difference computations.
   The default is 0, which performs a cheap check, and higher values result in more expensive and detailed checking.
   Setting the value to -1 disables the checking, which should be done on a production run if you have already verified the derivatives.
-``Major step limit``
+  
+### ``Major step limit``
   This value :math:`r` is used to compute an upper bound on the step length:
 
-  .. math::
-    \beta = r\left(\frac{1 + ||x||}{||p||}\right)
+![\beta = r\left(\frac{1 + ||x||}{||p||}\right)](https://render.githubusercontent.com/render/math?math=%5Cbeta%20%3D%20r%5Cleft(%5Cfrac%7B1%20%2B%20%7C%7Cx%7C%7C%7D%7B%7C%7Cp%7C%7C%7D%5Cright))
 
   and the first step length attempted is :math:`\alpha_1=\min(1,\beta)`.
   On typicaly problems, the default value of :math:`r=2` will cause :math:`\beta > 1`, so it will not affect the line search.
   However, if the line search repeatedly takes large steps, possibly into undefined regions in your optimization problem, then adjusting this number to 0.1 or even 0.01 may improve the optimization behavior.
   But small step sizes will significantly impede progress towards the end of the optimization.
   It may be worthwhile to look into improved optimization scaling to alleviate this problem instead.
-``Derivative linesearch`` and ``Nonderivative linesearch``
+  
+### ``Derivative linesearch`` and ``Nonderivative linesearch``
   These options control whether or not to use gradients in the line search.
   If gradients are relatively cheap to compute, then they can help in the line search process.
   Given the initial point and a candidate point along the search direction, if both function values and gradients are available at those two points, then there exists a unique cubic polynomial which interpolates them.
   This can be used to reduce the number of function evaluations needed during line search, at the expense of gradient evaluations.
   However, in some cases it may be more effective to use non-derivative line search, especially if the function is highly nonlinear and the gradients are expensive.
-``Penalty parameter``
+  
+### ``Penalty parameter``
   This sets the initial penalty parameter used with the merit function during line search.
   A higher value would force the line search to satisfy feasibility more quickly, but perhaps at the cost of slower convergence.
   Note that this only sets the initial value, and SNOPT internally will adaptively change the penalty parameter during optimization.
   Furthermore, a scalar value is applied here, but in reality the penalty parameter is a vector, with each entry corresponding to one constraint.
   It is not possible to set different initial values for different constraints.
-``Hessian full memory``
+  
+### ``Hessian full memory``
   This should always be used instead of ``Hessian limited memory``.
-``Hessian frequency``
+  
+### ``Hessian frequency``
   This parameter is very much dependent on the nature of the optimization problem.
   If there is significant nonlinearity in the objective or constraints, for example due to KS aggregation, then a low value such as 10 could be used.
   For nicely-behaved problems such as aerodynamic optimization with twist, a sufficiently large number should be used such that no reset occurs during optimization.
   The default value for this parameter is 999999.
-``LU complete pivoting``
+  
+### ``LU complete pivoting``
   This refers to the LUSOL factorization within SNOPT.
   Through experimentation, it was determined that complete pivoting is the superior of the three options available, and should be always used.
-``Function precision``
+  
+### ``Function precision``
   This parameter describes the expected precision of the function evaluations, for both the objective and constraints.
   Line search is terminated when the difference between function values along the search direction becomes smaller than this value.
 
@@ -107,7 +113,7 @@ The exit codes come in a pair of numbers, the first one signifying the type of e
 This is the dream.
 Optimization finished and satisifed all prescribed tolerances.
 
-#### ~~~
+#### 0/3
 Optimization finished, but could not achieve the prescribed optimality tolerance.
 This occurs when SNOPT is less than two orders of magnitude away from the prescribed optimality tolerance, but cannot proceed further.
 This is actually EXIT 40/41 wrapped in a deceptively benign-looking way.

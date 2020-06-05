@@ -83,26 +83,159 @@ For these options, the corresponding value in the dictionary must be supplied as
   Furthermore, a scalar value is applied here, but in reality the penalty parameter is a vector, with each entry corresponding to one constraint.
   It is not possible to set different initial values for different constraints.
   
-### ``Hessian full memory``
-  This should always be used instead of ``Hessian limited memory``.
-  
-### ``Hessian frequency``
-  This parameter is very much dependent on the nature of the optimization problem.
-  If there is significant nonlinearity in the objective or constraints, for example due to KS aggregation, then a low value such as 10 could be used.
-  For nicely-behaved problems such as aerodynamic optimization with twist, a sufficiently large number should be used such that no reset occurs during optimization.
-  The default value for this parameter is 999999.
-  
-### ``LU complete pivoting``
-  This refers to the LUSOL factorization within SNOPT.
-  Through experimentation, it was determined that complete pivoting is the superior of the three options available, and should be always used.
-  
 ### ``Function precision``
   This parameter describes the expected precision of the function evaluations, for both the objective and constraints.
   Line search is terminated when the difference between function values along the search direction becomes smaller than this value.
 
 
 
-## How to interpret SNOPT results: the SNOPT_print.out file
+## How to interpret SNOPT results: the `SNOPT_print.out` file
+
+When SNOPT runs it produces two files: `SNOPT_print.out` and `SNOPT_summary.out`.
+The more useful file to examine is `SNOPT_print.out`, so we explain how to read it here.
+
+### Example `SNOPT_print.out` file
+
+```
+
+         ==============================
+         S N O P T  7.2-12.2 (Jul 2013)
+         ==============================
+      Derivative level               3
+1
+ 
+ SNMEMB EXIT 100 -- finished successfully
+ SNMEMB INFO 104 -- memory requirements estimated
+
+         ==============================
+         S N O P T  7.2-12.2 (Jul 2013)
+         ==============================
+      Derivative level               3
+1
+ 
+ Parameters
+ ==========
+
+ Files
+ -----
+ Solution file..........         0       Old basis file ........         0       Standard input.........         5
+ Insert file............         0       New basis file ........         0       (Printer)..............        18
+ Punch file.............         0       Backup basis file......         0       (Specs file)...........         0
+ Load file..............         0       Dump file..............         0       Standard output........         6
+
+ Frequencies
+ -----------
+ Print frequency........       100       Check frequency........        60       Save new basis map.....       100
+ Summary frequency......       100       Factorization frequency        50       Expand frequency.......     10000
+
+ QP subproblems
+ --------------
+ QPsolver Cholesky......
+ Scale tolerance........     0.900       Minor feasibility tol..  1.00E-06       Iteration limit........     10000
+ Scale option...........         0       Minor optimality  tol..  1.00E-06       Minor print level......         1
+ Crash tolerance........     0.100       Pivot tolerance........  3.25E-11       Partial price..........         1
+ Crash option...........         3       Elastic weight.........  1.00E+04       Prtl price section ( A)         2
+                                         New superbasics........        99       Prtl price section (-I)         2
+
+ The SQP Method
+ --------------
+ Minimize...............                 Cold start.............                 Proximal Point method..         1
+ Nonlinear objectiv vars         2       Major optimality tol...  2.00E-06       Function precision.....  3.00E-13
+ Unbounded step size....  1.00E+20       Superbasics limit......         2       Difference interval....  5.48E-07
+ Unbounded objective....  1.00E+15       Reduced Hessian dim....         2       Central difference int.  6.70E-05
+ Major step limit.......  2.00E+00       Derivative linesearch..                 Derivative level.......         3
+ Major iterations limit.      1000       Linesearch tolerance...   0.90000       Verify level...........         0
+ Minor iterations limit.       500       Penalty parameter......  0.00E+00       Major Print Level......         1
+
+ Hessian Approximation
+ ---------------------
+ Full-Memory Hessian....                 Hessian updates........  99999999       Hessian frequency......  99999999
+                                                                                 Hessian flush..........  99999999
+
+ Nonlinear constraints
+ ---------------------
+ Nonlinear constraints..         2       Major feasibility tol..  1.00E-06       Violation limit........  1.00E+06
+ Nonlinear Jacobian vars         2
+
+ Miscellaneous
+ -------------
+ LU factor tolerance....      3.99       LU singularity tol.....  3.25E-11       Timing level...........         3
+ LU update tolerance....      3.99       LU swap tolerance......  1.22E-04       Debug level............         0
+ LU partial  pivoting...                 eps (machine precision)  2.22E-16       System information.....        No
+                                                                                 Sticky parameters......        No
+1
+ 
+
+ 
+
+ Matrix statistics
+ -----------------
+               Total      Normal        Free       Fixed     Bounded
+ Rows              2           2           0           0           0
+ Columns           2           0           0           0           2
+
+ No. of matrix elements                    4     Density     100.000
+ Biggest  constant element        0.0000E+00  (excluding fixed columns,
+ Smallest constant element        0.0000E+00   free rows, and RHS)
+
+ No. of objective coefficients             0
+
+ Nonlinear constraints       2     Linear constraints       0
+ Nonlinear variables         2     Linear variables         0
+ Jacobian  variables         2     Objective variables      2
+ Total constraints           2     Total variables          2
+1
+ 
+
+ 
+ The user has defined       4   out of       4   constraint gradients.
+ The user has defined       2   out of       2   objective  gradients.
+
+ Cheap test of user-supplied problem derivatives...
+
+ The constraint gradients seem to be OK.
+
+ -->  The largest discrepancy was    3.65E-07  in constraint     4
+ 
+
+ The objective  gradients seem to be OK.
+
+ Gradient projected in one direction  -9.03003000000E+02
+ Difference approximation             -9.03002177940E+02
+1
+ 
+ 
+
+   Itns Major Minors    Step   nCon Feasible  Optimal  MeritFunction     L+U BSwap     nS  condHz Penalty
+      1     0      1              1  9.6E-01  8.7E+00  9.0900000E+02       3                              _  r
+      2     1      1 5.1E-01      2  7.6E-01  1.3E+00  1.9894663E+06       3                              _n rli
+      3     2      1 7.3E-01      3  6.9E-01  1.7E-01  1.0136448E+06       3            1 2.0E+06         _s  li
+      4     3      1 1.0E+00      5  4.0E-01  1.2E+03  8.6840019E+05       3                      2.0E+06 _sM
+      4     4      0 4.2E-01      7  1.9E-01  7.2E+02  5.0308509E+05       3                      2.0E+06 _
+      4     5      0 6.3E-01      9  5.9E-02  2.6E+02  1.8503308E+05       3                      2.0E+06 _
+      4     6      0 1.0E+00     10 (0.0E+00)(0.0E+00) 3.0650000E+02       3                      2.0E+06 _
+1
+ 
+ SNOPTC EXIT   0 -- finished successfully
+ SNOPTC INFO   1 -- optimality conditions satisfied
+
+ Problem name                 H
+ No. of iterations                   4   Objective value      3.0650000000E+02
+ No. of major iterations             6   Linear objective     0.0000000000E+00
+ Penalty parameter           1.954E+06   Nonlinear objective  3.0650000000E+02
+ No. of calls to funobj             11   No. of calls to funcon             11
+ No. of degenerate steps             0   Percentage                       0.00
+ Max x                       2 2.0E+00   Max pi                      1 7.0E+02
+ Max Primal infeas           0 0.0E+00   Max Dual infeas             0 0.0E+00
+ Nonlinear constraint violn    0.0E+00
+1
+ 
+ Name           H                        Objective Value      3.0650000000E+02
+
+ Status         Optimal Soln             Iteration      4    Superbasics     0
+
+ Objective      
+```
 
 ### Exit Codes
 SNOPT provides a large number of exit codes.
@@ -111,7 +244,7 @@ The exit codes come in a pair of numbers, the first one signifying the type of e
 
 #### 0/1
 This is the dream.
-Optimization finished and satisifed all prescribed tolerances.
+Optimization finished and satisfied all prescribed tolerances.
 
 #### 0/3
 Optimization finished, but could not achieve the prescribed optimality tolerance.
@@ -135,7 +268,6 @@ Therefore, it's really important to improve the convergence of the analyses.
 Correspondingly, it's equally important to provide accurate gradients, meaning a tightly-converged adjoint.
 
 As a last thing, poor problem scaling can easily cause this problem.
-
 
 #### 60/61
 The initial function evaluation failed.
